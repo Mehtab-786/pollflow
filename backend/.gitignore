@@ -1,0 +1,16 @@
+# Dependencies
+node_modules/
+
+# Environment variables
+.env
+
+# TypeScript build output
+dist/
+
+# Prisma generated client
+src/generated/
+
+# Logs & Runtime
+logs/
+*.log
+npm-debug.log*
