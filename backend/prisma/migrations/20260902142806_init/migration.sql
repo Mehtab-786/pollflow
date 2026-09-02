@@ -16,7 +16,6 @@ CREATE TABLE "User" (
     "username" TEXT NOT NULL,
     "passwordHash" TEXT NOT NULL,
     "email" TEXT NOT NULL,
-    "tokenHash" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
