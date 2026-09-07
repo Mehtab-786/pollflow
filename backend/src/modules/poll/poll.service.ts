@@ -138,4 +138,45 @@ const createPoll = async ({
     }
 };
 
-export { createPoll };
+const getPublishedPolls = async () => {
+    try {
+        // Query published polls for list/card view (lightweight summary)
+        const polls = await prisma.poll.findMany({
+            where: {
+                isPublished: true,
+            },
+            orderBy: { createdAt: "desc" },
+            select: {
+                id: true,
+                title: true,
+                type: true,
+                createdAt: true,
+                expiresAt: true,
+                creator: {
+                    select: {
+                        id: true,
+                        username: true,
+                    },
+                },
+                _count: {
+                    select: {
+                        questions: true,
+                        responses: true,
+                    },
+                },
+            },
+        });
+
+        return polls;
+    } catch (error) {
+        if (error instanceof ApiError) {
+            throw error;
+        }
+        throw new ApiError(
+            500,
+            error instanceof Error ? error.message : "Failed to fetch published polls"
+        );
+    }
+};
+
+export { createPoll, getPublishedPolls };

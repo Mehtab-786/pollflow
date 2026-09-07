@@ -42,4 +42,12 @@ const createPoll = async (req: Request, res: Response) => {
     });
 };
 
-export { createPoll };
+const getPublishedPolls = async (_req: Request, res: Response) => {
+    const polls = await pollService.getPublishedPolls();
+
+    return sendResponse(res, 200, "Published polls fetched successfully", {
+        polls,
+    });
+};
+
+export { createPoll, getPublishedPolls };
