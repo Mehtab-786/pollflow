@@ -354,6 +354,77 @@ const getPollById = async (pollId: string, userId?: string | null) => {
     }
 };
 
-export { createPoll, getPublishedPolls, getMyPolls, getPollById };
+const publishPoll = async ({
+    pollId,
+    userId,
+}: {
+    pollId: string;
+    userId: string;
+}) => {
+    try {
+        if (!pollId) {
+            throw new ApiError(400, "Poll ID is required");
+        }
 
+        if (!userId) {
+            throw new ApiError(401, "User ID is required");
+        }
+
+        // 1. Verify user exists
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            select: { id: true },
+        });
+
+        if (!user) {
+            throw new ApiError(404, "User not found");
+        }
+
+        // 2. Verify poll exists
+        const poll = await prisma.poll.findUnique({
+            where: { id: pollId },
+        });
+
+        if (!poll) {
+            throw new ApiError(404, "Poll not found");
+        }
+
+        // 3. Verify user is the creator
+        if (poll.creatorId !== userId) {
+            throw new ApiError(403, "You are not authorized to publish this poll");
+        }
+
+        // 4. Verify poll is expired
+        const isExpired = Boolean(poll.expiresAt && new Date() > new Date(poll.expiresAt));
+        if (!isExpired) {
+            throw new ApiError(400, "Cannot publish poll before it has expired");
+        }
+
+        // 5. Check if already published
+        if (poll.isPublished) {
+            throw new ApiError(400, "Poll is already published");
+        }
+
+        // 6. Update isPublished to true
+        const updatedPoll = await prisma.poll.update({
+            where: { id: pollId },
+            data: { isPublished: true },
+            select: {
+                id: true,
+            },
+        });
+
+        return updatedPoll;
+    } catch (error) {
+        if (error instanceof ApiError) {
+            throw error;
+        }
+        throw new ApiError(
+            500,
+            error instanceof Error ? error.message : "Failed to publish poll"
+        );
+    }
+};
+
+export { createPoll, getPublishedPolls, getMyPolls, getPollById, publishPoll };
 

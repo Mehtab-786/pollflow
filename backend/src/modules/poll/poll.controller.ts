@@ -79,6 +79,26 @@ const getPollById = async (req: Request, res: Response) => {
     });
 };
 
-export { createPoll, getPublishedPolls, getMyPolls, getPollById };
+const publishPoll = async (req: Request, res: Response) => {
+    const pollId = req.params.id;
+    const userId = req.userId;
+
+    if (!userId) {
+        throw new ApiError(401, "Unauthorized");
+    }
+
+    if (!pollId || typeof pollId !== "string") {
+        throw new ApiError(400, "Poll ID is required");
+    }
+
+    const poll = await pollService.publishPoll({ pollId, userId });
+
+    return sendResponse(res, 200, "Poll published successfully", {
+        poll,
+    });
+};
+
+export { createPoll, getPublishedPolls, getMyPolls, getPollById, publishPoll };
+
 
 
