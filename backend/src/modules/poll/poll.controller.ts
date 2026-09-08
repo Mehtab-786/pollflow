@@ -4,7 +4,7 @@ import ApiError from "../../common/utils/APIError.utils.js";
 import * as pollService from "./poll.service.js";
 
 const createPoll = async (req: Request, res: Response) => {
-    const creatorId = req.user?.id;
+    const creatorId = req.userId;
 
     if (!creatorId) {
         throw new ApiError(401, "Unauthorized");
@@ -50,4 +50,35 @@ const getPublishedPolls = async (_req: Request, res: Response) => {
     });
 };
 
-export { createPoll, getPublishedPolls };
+const getMyPolls = async (req: Request, res: Response) => {
+    const userId = req.userId;
+
+    if (!userId) {
+        throw new ApiError(401, "Unauthorized");
+    }
+
+    const polls = await pollService.getMyPolls(userId);
+
+    return sendResponse(res, 200, "User polls fetched successfully", {
+        polls,
+    });
+};
+
+const getPollById = async (req: Request, res: Response) => {
+    const id = req.params.id;
+    const userId = req.userId ?? null;
+
+    if (!id || typeof id !== "string") {
+        throw new ApiError(400, "Poll ID is required");
+    }
+
+    const poll = await pollService.getPollById(id, userId);
+
+    return sendResponse(res, 200, "Poll fetched successfully", {
+        poll,
+    });
+};
+
+export { createPoll, getPublishedPolls, getMyPolls, getPollById };
+
+

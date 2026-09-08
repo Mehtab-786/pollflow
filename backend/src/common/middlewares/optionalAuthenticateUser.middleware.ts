@@ -1,10 +1,11 @@
 import type { Request, Response, NextFunction } from "express";
+import prisma from "../config/db.config.js";
 import ApiError from "../utils/APIError.utils.js";
 import { verifyAccessToken } from "../utils/jwt.utils.js";
 
-const authenticateUser = async (
+const optionalAuthenticateUser = async (
     req: Request,
-    res: Response,
+    _res: Response,
     next: NextFunction
 ) => {
     // 1. Extract token from cookie (web) or Authorization header (Bearer)
@@ -14,8 +15,9 @@ const authenticateUser = async (
             ? req.headers.authorization.split(" ")[1]
             : null);
 
+    // If no token is provided, continue with req.user undefined
     if (!token) {
-        throw new ApiError(401, "Authentication token is missing");
+        return next();
     }
 
     // 2. Verify token signature and expiration
@@ -36,4 +38,4 @@ const authenticateUser = async (
     next();
 };
 
-export { authenticateUser };
+export default optionalAuthenticateUser;

@@ -29,8 +29,7 @@ const register = async (req: Request, res: Response) => {
 };
 
 const login = async (req: Request, res: Response) => {
-    const { user, accessToken, refreshToken } =
-        await authService.login(req.body);
+    const { user, accessToken, refreshToken } = await authService.login(req.body);
 
     res.cookie("accessToken", accessToken, {
         ...cookieOptions,
@@ -80,7 +79,7 @@ const logout = async (req: Request, res: Response) => {
 };
 
 const profile = async (req: Request, res: Response) => {
-    const user = await authService.profile(req.user!.id);
+    const user = await authService.profile(req.userId!);
     return sendResponse(res, 200, "User profile", user);
 };
 

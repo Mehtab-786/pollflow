@@ -179,4 +179,181 @@ const getPublishedPolls = async () => {
     }
 };
 
-export { createPoll, getPublishedPolls };
+const getMyPolls = async (userId: string) => {
+    try {
+        const polls = await prisma.poll.findMany({
+            where: {
+                creatorId: userId,
+            },
+            orderBy: {
+                createdAt: "desc",
+            },
+            select: {
+                id: true,
+                title: true,
+                type: true,
+                expiresAt: true,
+                isPublished: true,
+                createdAt: true,
+            },
+        });
+
+        return polls;
+    } catch (error) {
+        if (error instanceof ApiError) {
+            throw error;
+        }
+        throw new ApiError(
+            500,
+            error instanceof Error ? error.message : "Failed to fetch user polls"
+        );
+    }
+};
+
+const getPollById = async (pollId: string, userId?: string | null) => {
+    try {
+        if (!pollId) {
+            throw new ApiError(400, "Poll ID is required");
+        }
+
+        const poll = await prisma.poll.findUnique({
+            where: { id: pollId },
+            include: {
+                creator: {
+                    select: {
+                        id: true,
+                        username: true,
+                    },
+                },
+                questions: {
+                    orderBy: { position: "asc" },
+                    include: {
+                        options: {
+                            select: {
+                                id: true,
+                                text: true,
+                                _count: {
+                                    select: { answers: true },
+                                },
+                            },
+                        },
+                    },
+                },
+                _count: {
+                    select: { responses: true },
+                },
+            },
+        });
+
+        if (!poll) {
+            throw new ApiError(404, "Poll not found");
+        }
+
+        const isExpired = Boolean(poll.expiresAt && new Date() > new Date(poll.expiresAt));
+        const isCreator = Boolean(userId && poll.creatorId === userId);
+
+        // 1. If creator is viewing their own poll, return full data
+        if (isCreator) {
+            return {
+                id: poll.id,
+                title: poll.title,
+                type: poll.type,
+                responseMode: poll.responseMode,
+                expiresAt: poll.expiresAt,
+                isPublished: poll.isPublished,
+                isExpired,
+                isCreator: true,
+                createdAt: poll.createdAt,
+                creator: poll.creator,
+                totalResponses: poll._count.responses,
+                questions: poll.questions.map((q) => ({
+                    id: q.id,
+                    question: q.question,
+                    position: q.position,
+                    isRequired: q.isRequired,
+                    type: q.type,
+                    selectionMode: q.selectionMode,
+                    options: q.options.map((opt) => ({
+                        id: opt.id,
+                        text: opt.text,
+                        votesCount: opt._count.answers,
+                    })),
+                })),
+            };
+        }
+
+        // 2. If not creator:
+        if (isExpired) {
+            // Expired and not published -> error
+            if (!poll.isPublished) {
+                throw new ApiError(400, "Poll expired already");
+            }
+
+            // Expired and published -> return results
+            return {
+                id: poll.id,
+                title: poll.title,
+                type: poll.type,
+                responseMode: poll.responseMode,
+                expiresAt: poll.expiresAt,
+                isPublished: true,
+                isExpired: true,
+                isCreator: false,
+                createdAt: poll.createdAt,
+                creator: poll.creator,
+                totalResponses: poll._count.responses,
+                questions: poll.questions.map((q) => ({
+                    id: q.id,
+                    question: q.question,
+                    position: q.position,
+                    isRequired: q.isRequired,
+                    type: q.type,
+                    selectionMode: q.selectionMode,
+                    options: q.options.map((opt) => ({
+                        id: opt.id,
+                        text: opt.text,
+                        votesCount: opt._count.answers,
+                    })),
+                })),
+            };
+        }
+
+        // 3. Not creator and not expired -> return active poll questions & options to answer
+        return {
+            id: poll.id,
+            title: poll.title,
+            type: poll.type,
+            responseMode: poll.responseMode,
+            expiresAt: poll.expiresAt,
+            isPublished: poll.isPublished,
+            isExpired: false,
+            isCreator: false,
+            createdAt: poll.createdAt,
+            creator: poll.creator,
+            questions: poll.questions.map((q) => ({
+                id: q.id,
+                question: q.question,
+                position: q.position,
+                isRequired: q.isRequired,
+                type: q.type,
+                selectionMode: q.selectionMode,
+                options: q.options.map((opt) => ({
+                    id: opt.id,
+                    text: opt.text,
+                })),
+            })),
+        };
+    } catch (error) {
+        if (error instanceof ApiError) {
+            throw error;
+        }
+        throw new ApiError(
+            500,
+            error instanceof Error ? error.message : "Failed to fetch poll"
+        );
+    }
+};
+
+export { createPoll, getPublishedPolls, getMyPolls, getPollById };
+
+

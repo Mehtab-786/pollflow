@@ -16,22 +16,14 @@ export interface AuthTokens {
 }
 
 export interface AuthenticatedRequest extends Request {
-    user: {
-        id: string;
-        email?: string;
-        username?: string;
-    };
+    userId: string;
 }
 
 // Extends Express Request right here inside auth.types.ts
 declare global {
     namespace Express {
         interface Request {
-            user?: {
-                id: string;
-                email?: string;
-                username?: string;
-            };
+            userId?: string;
         }
     }
 }

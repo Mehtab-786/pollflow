@@ -10,6 +10,7 @@ import {
 import validate from "../../common/middlewares/validate.middlewares.js";
 import { CreatePollDTO } from "./poll.dto.js";
 import { authenticateUser } from "../../common/middlewares/auth.middleware.js";
+import optionalAuthenticateUser from "../../common/middlewares/optionalAuthenticateUser.middleware.js";
 
 const router = Router();
 
@@ -24,7 +25,7 @@ router.get("/", getPublishedPolls);
 router.get("/me", authenticateUser, getMyPolls);
 
 // 4. Get specific poll by ID if published (Public / Protected)
-router.get("/:id", getPollById);
+router.get("/:id", optionalAuthenticateUser, getPollById);
 
 // 5. Publish a poll (Protected - Creator only)
 router.post("/:id/publish", authenticateUser, publishPoll);
