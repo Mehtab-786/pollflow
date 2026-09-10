@@ -252,7 +252,7 @@ const getPollById = async (pollId: string, userId?: string | null) => {
         const isExpired = Boolean(poll.expiresAt && new Date() > new Date(poll.expiresAt));
         const isCreator = Boolean(userId && poll.creatorId === userId);
 
-        // 1. If creator is viewing their own poll, return full data
+        // 1. If user is the creator: no more checking, return full details
         if (isCreator) {
             return {
                 id: poll.id,
@@ -282,14 +282,13 @@ const getPollById = async (pollId: string, userId?: string | null) => {
             };
         }
 
-        // 2. If not creator:
-        if (isExpired) {
-            // Expired and not published -> error
-            if (!poll.isPublished) {
-                throw new ApiError(400, "Poll expired already");
-            }
+        // 2. If expired and not published & user is not creator -> Reject / Not available
+        if (isExpired && !poll.isPublished) {
+            throw new ApiError(400, "Poll is not available");
+        }
 
-            // Expired and published -> return results
+        // 3. If expired and published -> return results only (userId doesn't matter)
+        if (isExpired && poll.isPublished) {
             return {
                 id: poll.id,
                 title: poll.title,
@@ -318,7 +317,7 @@ const getPollById = async (pollId: string, userId?: string | null) => {
             };
         }
 
-        // 3. Not creator and not expired -> return active poll questions & options to answer
+        // 4. If not expired (published or unpublished direct-link) & not creator -> return questions & options only
         return {
             id: poll.id,
             title: poll.title,
