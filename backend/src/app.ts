@@ -4,6 +4,8 @@ import { errorHandler } from "./common/middlewares/error.middleware.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import authRouter from "./modules/auth/auth.routes.js";
+import pollRouter from "./modules/poll/poll.routes.js";
+import responseRouter from "./modules/response/response.routes.js";
 
 
 const app = express();
@@ -18,6 +20,8 @@ app.use(cookieParser());
 
 
 app.use("/api/v1/auth", authRouter);
+app.use("/api/v1/polls", pollRouter);
+app.use("/api/v1/polls", responseRouter);
 
 
 // Health check route
