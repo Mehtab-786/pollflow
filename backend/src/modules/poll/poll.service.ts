@@ -425,5 +425,111 @@ const publishPoll = async ({
     }
 };
 
-export { createPoll, getPublishedPolls, getMyPolls, getPollById, publishPoll };
+const getPollAnalytics = async ({ pollId, userId, }: {
+    pollId: string;
+    userId: string;
+}) => {
+    try {
+        if (!pollId) {
+            throw new ApiError(400, "Poll ID is required");
+        }
+
+        if (!userId) {
+            throw new ApiError(401, "User ID is required");
+        }
+
+        const poll = await prisma.poll.findUnique({
+            where: { id: pollId },
+            include: {
+                creator: {
+                    select: {
+                        id: true,
+                        username: true,
+                    },
+                },
+                questions: {
+                    orderBy: { position: "asc" },
+                    include: {
+                        options: {
+                            select: {
+                                id: true,
+                                text: true,
+                                _count: {
+                                    select: { answers: true },
+                                },
+                            },
+                        },
+                    },
+                },
+                _count: {
+                    select: { responses: true },
+                },
+            },
+        });
+
+        if (!poll) {
+            throw new ApiError(404, "Poll not found");
+        }
+
+        if (poll.creatorId !== userId) {
+            throw new ApiError(403, "You are not authorized to view this poll's analytics");
+        }
+
+        const totalResponses = poll._count.responses;
+
+        const questions = poll.questions.map((q) => {
+            const totalQuestionVotes = q.options.reduce(
+                (sum, opt) => sum + opt._count.answers,
+                0
+            );
+
+            return {
+                id: q.id,
+                question: q.question,
+                position: q.position,
+                isRequired: q.isRequired,
+                type: q.type,
+                selectionMode: q.selectionMode,
+                totalVotes: totalQuestionVotes,
+                options: q.options.map((opt) => {
+                    const votesCount = opt._count.answers;
+                    const percentage =
+                        totalQuestionVotes > 0
+                            ? Number(((votesCount / totalQuestionVotes) * 100).toFixed(1))
+                            : 0;
+
+                    return {
+                        id: opt.id,
+                        text: opt.text,
+                        votesCount,
+                        percentage,
+                    };
+                }),
+            };
+        });
+
+        return {
+            id: poll.id,
+            title: poll.title,
+            type: poll.type,
+            responseMode: poll.responseMode,
+            expiresAt: poll.expiresAt,
+            isPublished: poll.isPublished,
+            createdAt: poll.createdAt,
+            creator: poll.creator,
+            totalResponses,
+            questions,
+        };
+    } catch (error) {
+        if (error instanceof ApiError) {
+            throw error;
+        }
+        throw new ApiError(
+            500,
+            error instanceof Error ? error.message : "Failed to fetch poll analytics"
+        );
+    }
+};
+
+export { createPoll, getPublishedPolls, getMyPolls, getPollById, publishPoll, getPollAnalytics };
 

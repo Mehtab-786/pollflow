@@ -1,6 +1,7 @@
 import prisma from "../../common/config/db.config.js";
 import ApiError from "../../common/utils/APIError.utils.js";
 import type { SubmitAnswerInput, SubmitPollResponseParams } from "./response.types.js";
+import { emitPollVoteUpdate } from "./response.socket.js";
 
 const submitPollResponse = async ({
     pollId,
@@ -137,7 +138,17 @@ const submitPollResponse = async ({
             return response;
         });
 
-        // 8. Return response summary
+        // 8. Broadcast real-time update to active analytics listeners (if any)
+        emitPollVoteUpdate(pollId, {
+            totalResponsesIncrement: 1,
+            answers: createdResponse.answers.map((ans) => ({
+                questionId: ans.questionId,
+                optionId: ans.optionId,
+            })),
+            timestamp: createdResponse.createdAt,
+        });
+
+        // 9. Return response summary
         return {
             id: createdResponse.id,
             pollId: createdResponse.pollId,
