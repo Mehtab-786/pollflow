@@ -140,14 +140,13 @@ const submitPollResponse = async ({
 
         // 8. Broadcast real-time update to active analytics listeners (if any)
         emitPollVoteUpdate(pollId, {
-            totalResponseIncrement: 1,
+            totalResponsesIncrement: 1,
             answers: createdResponse.answers.map((ans) => ({
                 questionId: ans.questionId,
                 optionId: ans.optionId,
             })),
             timestamp: createdResponse.createdAt,
         });
-
 
 
         // 9. Return response summary

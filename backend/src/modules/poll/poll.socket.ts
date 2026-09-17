@@ -1,58 +1,118 @@
-import type { Socket, Server } from "socket.io";
+import type { Server, Socket } from "socket.io";
 import prisma from "../../common/config/db.config.js";
 
-export function registerPollSocketHandlers(_io: Server, socket: Socket) {
+export const registerPollSocketHandlers = (_io: Server, socket: Socket): void => {
     const userId = socket.data.userId;
 
-    // 1. Join Poll Analytics Room
-    socket.on("join-analytics", async (pollId: unknown) => {
+    // Helper handler for joining poll analytics room
+    const handleJoinAnalytics = async (
+        data: unknown,
+        callback?: (response: { success: boolean; message: string; pollId?: string }) => void
+    ) => {
         try {
-            // Validate input
+            const pollId = typeof data === "string" ? data : (data as { pollId?: string })?.pollId;
+
             if (!pollId || typeof pollId !== "string") {
-                socket.emit("error", { message: "Valid Poll ID is required" });
+                const message = "Poll ID is required to join analytics room";
+                socket.emit("error", { message });
+                if (typeof callback === "function") {
+                    callback({ success: false, message });
+                }
                 return;
             }
 
-            // Authorization: Ensure poll exists and user is the creator
+            // Verify poll exists and that the connecting user is the creator
             const poll = await prisma.poll.findUnique({
                 where: { id: pollId },
-                select: { id: true, creatorId: true },
+                select: {
+                    id: true,
+                    creatorId: true,
+                },
             });
 
             if (!poll) {
-                socket.emit("error", { message: "Poll not found" });
+                const message = "Poll not found";
+                socket.emit("error", { message });
+                if (typeof callback === "function") {
+                    callback({ success: false, message, pollId });
+                }
                 return;
             }
 
             if (poll.creatorId !== userId) {
-                socket.emit("error", { message: "Unauthorized: Only the creator can view real-time analytics" });
+                const message = "Unauthorized: Only the poll creator can access real-time analytics";
+                socket.emit("error", { message });
+                if (typeof callback === "function") {
+                    callback({ success: false, message, pollId });
+                }
                 return;
             }
 
-            // Join the private analytics room for this poll
             const roomName = `poll:${pollId}:analytics`;
             await socket.join(roomName);
 
-            console.log(`📊 User ${userId} joined room: ${roomName}`);
-            socket.emit("joined-analytics", { pollId, message: "Successfully joined analytics room" });
-        } catch (error) {
-            console.error("Error joining analytics room:", error);
-            socket.emit("error", { message: "Failed to join analytics room" });
-        }
-    });
+            console.log(`📊 Socket ${socket.id} (User: ${userId}) joined room: ${roomName}`);
 
-    // 2. Leave Poll Analytics Room (Placed at top-level, not nested)
-    socket.on("leave-analytics", async (pollId: unknown) => {
+            const successPayload = {
+                success: true,
+                message: `Joined analytics room for poll ${pollId}`,
+                pollId,
+            };
+
+            // Emit confirmation events for both conventions
+            socket.emit("joined_poll_analytics", successPayload);
+            socket.emit("joined-analytics", successPayload);
+
+            if (typeof callback === "function") {
+                callback(successPayload);
+            }
+        } catch (error) {
+            console.error("❌ Error in join analytics handler:", error);
+            const message = "Internal server error while joining analytics room";
+            socket.emit("error", { message });
+            if (typeof callback === "function") {
+                callback({ success: false, message });
+            }
+        }
+    };
+
+    // Helper handler for leaving poll analytics room
+    const handleLeaveAnalytics = async (
+        data: unknown,
+        callback?: (response: { success: boolean; message: string; pollId?: string }) => void
+    ) => {
         try {
+            const pollId = typeof data === "string" ? data : (data as { pollId?: string })?.pollId;
+
             if (pollId && typeof pollId === "string") {
                 const roomName = `poll:${pollId}:analytics`;
                 await socket.leave(roomName);
+
                 console.log(`📊 Socket ${socket.id} left room: ${roomName}`);
-                socket.emit("left-analytics", { pollId });
+
+                const successPayload = {
+                    success: true,
+                    message: `Left analytics room for poll ${pollId}`,
+                    pollId,
+                };
+
+                socket.emit("left_poll_analytics", successPayload);
+                socket.emit("left-analytics", successPayload);
+
+                if (typeof callback === "function") {
+                    callback(successPayload);
+                }
             }
         } catch (error) {
-            console.error("Error leaving analytics room:", error);
+            console.error("❌ Error in leave analytics handler:", error);
         }
-    });
-}
+    };
+
+    // Register listeners for both naming conventions
+    socket.on("join_poll_analytics", handleJoinAnalytics);
+    socket.on("join-analytics", handleJoinAnalytics);
+
+    socket.on("leave_poll_analytics", handleLeaveAnalytics);
+    socket.on("leave-analytics", handleLeaveAnalytics);
+};
 

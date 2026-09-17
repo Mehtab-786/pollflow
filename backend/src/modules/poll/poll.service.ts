@@ -425,12 +425,32 @@ const publishPoll = async ({
     }
 };
 
-const getPollAnalytics = async ({ pollId, userId }: { pollId: string; userId: string }) => {
+const getPollAnalytics = async ({
+    pollId,
+    userId,
+}: {
+    pollId: string;
+    userId: string;
+}) => {
     try {
-        // Step 1: All-in-one fetch with Prisma relation counts
+        if (!pollId) {
+            throw new ApiError(400, "Poll ID is required");
+        }
+
+        if (!userId) {
+            throw new ApiError(401, "User ID is required");
+        }
+
+        // Single query fetch with creator details, counts, and questions
         const poll = await prisma.poll.findUnique({
             where: { id: pollId },
             include: {
+                creator: {
+                    select: {
+                        id: true,
+                        username: true,
+                    },
+                },
                 _count: {
                     select: { responses: true }, // Total poll submissions
                 },
@@ -441,9 +461,11 @@ const getPollAnalytics = async ({ pollId, userId }: { pollId: string; userId: st
                             select: { answers: true }, // Total answers for question
                         },
                         options: {
-                            include: {
+                            select: {
+                                id: true,
+                                text: true,
                                 _count: {
-                                    select: { answers: true }, // Votes for this option
+                                    select: { answers: true }, // Votes for option
                                 },
                             },
                         },
@@ -457,52 +479,65 @@ const getPollAnalytics = async ({ pollId, userId }: { pollId: string; userId: st
         }
 
         if (poll.creatorId !== userId) {
-            throw new ApiError(403, "Unauthorized: Only the creator can view analytics");
+            throw new ApiError(403, "You are not authorized to view this poll's analytics");
         }
 
-        // Step 2 & 3: Format and compute percentages
         const totalResponses = poll._count.responses;
 
-        const analytics = {
+        const questions = poll.questions.map((q) => {
+            const totalQuestionVotes = q.options.reduce(
+                (sum, opt) => sum + opt._count.answers,
+                0
+            );
+
+            return {
+                id: q.id,
+                question: q.question,
+                position: q.position,
+                isRequired: q.isRequired,
+                type: q.type,
+                selectionMode: q.selectionMode,
+                totalVotes: totalQuestionVotes,
+                totalAnswers: q._count.answers,
+                options: q.options.map((opt) => {
+                    const votesCount = opt._count.answers;
+                    const percentage =
+                        totalQuestionVotes > 0
+                            ? Number(((votesCount / totalQuestionVotes) * 100).toFixed(1))
+                            : 0;
+
+                    return {
+                        id: opt.id,
+                        text: opt.text,
+                        votes: votesCount,
+                        votesCount,
+                        percentage,
+                    };
+                }),
+            };
+        });
+
+        return {
             id: poll.id,
             title: poll.title,
             type: poll.type,
             responseMode: poll.responseMode,
-            isPublished: poll.isPublished,
             expiresAt: poll.expiresAt,
+            isPublished: poll.isPublished,
+            createdAt: poll.createdAt,
+            creator: poll.creator,
             totalResponses,
-            questions: poll.questions.map((q) => {
-                const totalQuestionAnswers = q._count.answers;
-
-                return {
-                    id: q.id,
-                    question: q.question,
-                    type: q.type,
-                    totalAnswers: totalQuestionAnswers,
-                    options: q.options.map((opt) => {
-                        const votes = opt._count.answers;
-                        const percentage = totalQuestionAnswers > 0
-                            ? Number(((votes / totalQuestionAnswers) * 100).toFixed(1))
-                            : 0;
-
-                        return {
-                            id: opt.id,
-                            text: opt.text,
-                            votes,
-                            percentage,
-                        };
-                    }),
-                };
-            }),
+            questions,
         };
-
-        return analytics;
     } catch (error) {
-        if (error instanceof ApiError) throw error;
-        throw new ApiError(500, error instanceof Error ? error.message : "Failed to fetch poll analytics");
+        if (error instanceof ApiError) {
+            throw error;
+        }
+        throw new ApiError(
+            500,
+            error instanceof Error ? error.message : "Failed to fetch poll analytics"
+        );
     }
 };
-
-
 export { createPoll, getPublishedPolls, getMyPolls, getPollById, publishPoll, getPollAnalytics };
 
