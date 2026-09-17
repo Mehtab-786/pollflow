@@ -8,3 +8,9 @@ export interface SubmitPollResponseParams {
     userId?: string | null;
     answers: SubmitAnswerInput[];
 }
+
+export interface PollVoteUpdatePayload {
+    totalResponseIncrement: number;
+    answers: SubmitAnswerInput[];
+    timestamp: Date | string;
+}

@@ -425,5 +425,84 @@ const publishPoll = async ({
     }
 };
 
-export { createPoll, getPublishedPolls, getMyPolls, getPollById, publishPoll };
+const getPollAnalytics = async ({ pollId, userId }: { pollId: string; userId: string }) => {
+    try {
+        // Step 1: All-in-one fetch with Prisma relation counts
+        const poll = await prisma.poll.findUnique({
+            where: { id: pollId },
+            include: {
+                _count: {
+                    select: { responses: true }, // Total poll submissions
+                },
+                questions: {
+                    orderBy: { position: "asc" },
+                    include: {
+                        _count: {
+                            select: { answers: true }, // Total answers for question
+                        },
+                        options: {
+                            include: {
+                                _count: {
+                                    select: { answers: true }, // Votes for this option
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        });
+
+        if (!poll) {
+            throw new ApiError(404, "Poll not found");
+        }
+
+        if (poll.creatorId !== userId) {
+            throw new ApiError(403, "Unauthorized: Only the creator can view analytics");
+        }
+
+        // Step 2 & 3: Format and compute percentages
+        const totalResponses = poll._count.responses;
+
+        const analytics = {
+            id: poll.id,
+            title: poll.title,
+            type: poll.type,
+            responseMode: poll.responseMode,
+            isPublished: poll.isPublished,
+            expiresAt: poll.expiresAt,
+            totalResponses,
+            questions: poll.questions.map((q) => {
+                const totalQuestionAnswers = q._count.answers;
+
+                return {
+                    id: q.id,
+                    question: q.question,
+                    type: q.type,
+                    totalAnswers: totalQuestionAnswers,
+                    options: q.options.map((opt) => {
+                        const votes = opt._count.answers;
+                        const percentage = totalQuestionAnswers > 0
+                            ? Number(((votes / totalQuestionAnswers) * 100).toFixed(1))
+                            : 0;
+
+                        return {
+                            id: opt.id,
+                            text: opt.text,
+                            votes,
+                            percentage,
+                        };
+                    }),
+                };
+            }),
+        };
+
+        return analytics;
+    } catch (error) {
+        if (error instanceof ApiError) throw error;
+        throw new ApiError(500, error instanceof Error ? error.message : "Failed to fetch poll analytics");
+    }
+};
+
+
+export { createPoll, getPublishedPolls, getMyPolls, getPollById, publishPoll, getPollAnalytics };
 
