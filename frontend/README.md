@@ -1,75 +1,62 @@
-# React + TypeScript + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+1. AppRoutes + ProtectedRoutes — separate or one?
 
-Currently, two official plugins are available:
+For your app, separate is fine, but not mandatory.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+I'd do:
 
-## React Compiler
+routes/
+├── AppRoutes.tsx
+└── ProtectedRoute.tsx
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+AppRoutes → defines the application's routes.
 
-## Expanding the ESLint configuration
+ProtectedRoute → reusable authentication guard.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Don't create ProtectedRoutes.tsx plural; ProtectedRoute.tsx is clearer because it's a component/guard.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
 
-```
+-------------Don't create a new socket connection inside every component. Keep the connection centralized.
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
 
-```
+5. Redux vs Zustand vs Context
+
+For your app, I would not use Redux initially.
+
+I'd choose:
+
+Zustand → global auth/user state
+
+and
+
+useState → local page state
+
+For example:
+
+Zustand
+├── user
+├── isAuthenticated
+└── auth loading
+
+useState
+├── poll answers
+├── current question
+├── modal open/close
+└── form state
+
+Context is also perfectly capable of handling auth state, but Zustand gives you a simpler dedicated global store without the boilerplate of Redux.
+
+So I'd go:
+
+Zustand + useState.
+
+Don't put API/server data into Zustand just because you can. If your app later needs serious server-state caching, that's where something like TanStack Query becomes relevant.
+
+
+Yes — TanStack Form + Zod is a solid choice for this project.
+----------------------------------
+
