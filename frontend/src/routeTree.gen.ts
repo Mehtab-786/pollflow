@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as authLoginRouteImport } from './routes/(auth)/login'
 import { Route as authRegisterRouteImport } from './routes/(auth)/register'
 import { Route as AuthenticatedCreatePollRouteImport } from './routes/_authenticated/create-poll'
@@ -23,6 +24,10 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const authLoginRoute = authLoginRouteImport.update({
   id: '/(auth)/login',
   path: '/login',
@@ -34,14 +39,14 @@ const authRegisterRoute = authRegisterRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedCreatePollRoute = AuthenticatedCreatePollRouteImport.update({
-  id: '/_authenticated/create-poll',
+  id: '/create-poll',
   path: '/create-poll',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
-  id: '/_authenticated/dashboard',
+  id: '/dashboard',
   path: '/dashboard',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
 const PollsIndexRoute = PollsIndexRouteImport.update({
   id: '/polls/',
@@ -55,9 +60,9 @@ const PollsPollIdRoute = PollsPollIdRouteImport.update({
 } as any)
 const AuthenticatedAnalyticsPollIdRoute =
   AuthenticatedAnalyticsPollIdRouteImport.update({
-    id: '/_authenticated/analytics/$pollId',
+    id: '/analytics/$pollId',
     path: '/analytics/$pollId',
-    getParentRoute: () => rootRouteImport,
+    getParentRoute: () => AuthenticatedRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -83,6 +88,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/(auth)/login': typeof authLoginRoute
   '/(auth)/register': typeof authRegisterRoute
   '/_authenticated/create-poll': typeof AuthenticatedCreatePollRoute
@@ -115,6 +121,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/_authenticated'
     | '/(auth)/login'
     | '/(auth)/register'
     | '/_authenticated/create-poll'
@@ -126,13 +133,11 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   authLoginRoute: typeof authLoginRoute
   authRegisterRoute: typeof authRegisterRoute
-  AuthenticatedCreatePollRoute: typeof AuthenticatedCreatePollRoute
-  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   PollsPollIdRoute: typeof PollsPollIdRoute
   PollsIndexRoute: typeof PollsIndexRoute
-  AuthenticatedAnalyticsPollIdRoute: typeof AuthenticatedAnalyticsPollIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -142,6 +147,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/(auth)/login': {
@@ -163,14 +175,14 @@ declare module '@tanstack/react-router' {
       path: '/create-poll'
       fullPath: '/create-poll'
       preLoaderRoute: typeof AuthenticatedCreatePollRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
     '/polls/': {
       id: '/polls/'
@@ -191,20 +203,34 @@ declare module '@tanstack/react-router' {
       path: '/analytics/$pollId'
       fullPath: '/analytics/$pollId'
       preLoaderRoute: typeof AuthenticatedAnalyticsPollIdRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
   }
 }
 
-const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  authLoginRoute: authLoginRoute,
-  authRegisterRoute: authRegisterRoute,
+interface AuthenticatedRouteChildren {
+  AuthenticatedCreatePollRoute: typeof AuthenticatedCreatePollRoute
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedAnalyticsPollIdRoute: typeof AuthenticatedAnalyticsPollIdRoute
+}
+
+const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedCreatePollRoute: AuthenticatedCreatePollRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedAnalyticsPollIdRoute: AuthenticatedAnalyticsPollIdRoute,
+}
+
+const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
+  AuthenticatedRouteChildren,
+)
+
+const rootRouteChildren: RootRouteChildren = {
+  IndexRoute: IndexRoute,
+  AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  authLoginRoute: authLoginRoute,
+  authRegisterRoute: authRegisterRoute,
   PollsPollIdRoute: PollsPollIdRoute,
   PollsIndexRoute: PollsIndexRoute,
-  AuthenticatedAnalyticsPollIdRoute: AuthenticatedAnalyticsPollIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -1,5 +1,10 @@
-import { createRootRoute, Outlet } from "@tanstack/react-router";
+import { Outlet, createRootRouteWithContext } from "@tanstack/react-router";
 
-export const Route = createRootRoute({
+
+interface RouterContext {
+    isAuthenticated: boolean
+}
+
+export const Route = createRootRouteWithContext<RouterContext>()({
     component: () => <Outlet />,
 });
