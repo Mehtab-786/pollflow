@@ -78,9 +78,9 @@ const logout = async (req: Request, res: Response) => {
     return sendResponse(res, 200, "Logout successful", null);
 };
 
-const profile = async (req: Request, res: Response) => {
-    const user = await authService.profile(req.userId!);
-    return sendResponse(res, 200, "User profile", user);
+const me = async (req: Request, res: Response) => {
+    const user = await authService.me(req.userId!);
+    return sendResponse(res, 200, "Current user fetched successfully", user);
 };
 
-export { register, login, logout, refresh, profile };
+export { register, login, logout, refresh, me };

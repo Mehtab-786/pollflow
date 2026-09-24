@@ -97,7 +97,7 @@ const refresh = async (token?: string) => {
     return { accessToken, refreshToken };
 };
 
-const profile = async (userId: string) => {
+const me = async (userId: string) => {
     const user = await prisma.user.findUnique({
         where: { id: userId },
         select: {
@@ -115,4 +115,4 @@ const profile = async (userId: string) => {
     return user;
 };
 
-export { register, login, refresh, profile };
+export { register, login, refresh, me };
