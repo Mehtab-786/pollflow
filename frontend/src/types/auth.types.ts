@@ -8,9 +8,11 @@ export interface User {
 export interface AuthContext {
     user: User | null
     isAuthenticated: boolean
+    isInitialized: boolean
 
     login: (user: User) => void
     logout: () => void
+    setInitialized: (initialized: boolean) => void
 }
 
 export interface LoginCredentials {

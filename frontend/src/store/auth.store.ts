@@ -7,16 +7,27 @@ export const useAuthStore = create<AuthContext>()(
         (set) => ({
             user: null,
             isAuthenticated: false,
+            isInitialized: false,
 
-            login: (user) => set(
-                { user, isAuthenticated: true }
-            ),
-            logout: () => set(
-                { user: null, isAuthenticated: false }
-            )
-
+            login: (user) => set({
+                user,
+                isAuthenticated: true,
+                isInitialized: true,
+            }),
+            logout: () => set({
+                user: null,
+                isAuthenticated: false,
+                isInitialized: true,
+            }),
+            setInitialized: (isInitialized) => set({ isInitialized }),
         }),
-        { name: 'auth-storage' }, // localStorage key
+        {
+            name: 'auth-storage',
+            partialize: (state) => ({
+                user: state.user,
+                isAuthenticated: state.isAuthenticated,
+            }),
+        },
     ),
 )
 

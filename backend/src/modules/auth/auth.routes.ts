@@ -13,8 +13,8 @@ router.post("/login", validate(LoginDTO), login);
 // To get new set of tokens
 router.post("/refresh", refresh);
 
-// Protected routes (Require valid access token)
-router.post("/logout", authenticateUser, logout);
+// Protected / Session routes
+router.post("/logout", logout);
 router.get("/me", authenticateUser, me);
 
 export default router;
