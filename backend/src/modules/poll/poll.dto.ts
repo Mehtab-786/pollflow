@@ -3,7 +3,7 @@ import BaseDTO from "../../common/DTO/base.dto.js";
 
 class CreatePollDTO extends BaseDTO {
     static schema = Joi.object({
-        title: Joi.string().trim().min(5).max(50).required().messages({
+        title: Joi.string().trim().min(5).max(255).required().messages({
             "string.empty": "Title is required",
             "string.min": "Title must contain at least 5 characters",
             "string.max": "Title must not exceed 50 characters",

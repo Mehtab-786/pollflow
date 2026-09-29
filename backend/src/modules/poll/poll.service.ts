@@ -72,10 +72,10 @@ const createPoll = async ({
                 let createdOptions: { id: string; text: string }[] = [];
 
                 if (questionType === "MULTIPLE_CHOICE") {
-                    if (!q.options || !Array.isArray(q.options) || q.options.length < 2) {
+                    if (!q.options || !Array.isArray(q.options) || q.options.length < 4) {
                         throw new ApiError(
                             400,
-                            `Question "${questionText}" must contain at least 2 options`
+                            `Question "${questionText}" must contain at least 4 options`
                         );
                     }
 
