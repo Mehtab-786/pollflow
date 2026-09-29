@@ -10,6 +10,7 @@ export default function Login() {
     const [error, setError] = useState('')
 
     const navigate = useNavigate()
+    const { login } = useAuthStore()
 
     const handleSubmit = async (e: React.SubmitEvent) => {
         e.preventDefault()
@@ -18,11 +19,9 @@ export default function Login() {
 
         try {
             let { success, data } = await authService.login({ email, password })
-            console.log(success, data)
-
 
             if (success) {
-                await useAuthStore().login(data)
+                login(data)
                 navigate({ to: '/' })
             }
         } catch (err) {
@@ -80,6 +79,22 @@ export default function Login() {
                     style={{ width: '100%', padding: '10px', cursor: isLoading ? 'not-allowed' : 'pointer' }}
                 >
                     {isLoading ? 'Signing in...' : 'Sign In'}
+                </button>
+
+                <button
+                    type="button"
+                    onClick={() => navigate({ to: '/register' })}
+                    style={{
+                        width: '100%',
+                        marginTop: '10px',
+                        padding: '10px',
+                        cursor: 'pointer',
+                        backgroundColor: 'transparent',
+                        border: '1px solid #ccc',
+                        borderRadius: '4px'
+                    }}
+                >
+                    Don't have an account? Sign Up
                 </button>
             </form>
         </div>

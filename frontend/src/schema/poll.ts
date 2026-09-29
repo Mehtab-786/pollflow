@@ -25,10 +25,10 @@ const questionSchema = z.discriminatedUnion("type", [
 
 
 export const pollSchema = z.object({
-    title: z.string().min(3).max(255).trim(),
+    title: z.string().min(5, "Title must be at least 5 characters").max(255).trim(),
     responseMode: z.enum(["ANONYMOUS", "AUTHENTICATED"]),
     type: z.enum(["POLL", "QUIZ"]),
-    expiresAt: z.string(),
-    questions: z.array(questionSchema).min(1),
+    expiresAt: z.string().optional(),
+    questions: z.array(questionSchema).min(1, "At least 1 question is required"),
 });
 

@@ -18,7 +18,7 @@ export interface POLL {
     title: string;
     responseMode: "ANONYMOUS" | "AUTHENTICATED";
     type: "POLL" | "QUIZ";
-    expiresAt: string;
+    expiresAt?: string;
     questions: QUESTIONS[];
 }
 
