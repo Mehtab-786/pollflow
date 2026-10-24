@@ -5,7 +5,7 @@ import * as authService from './auth.service.js'
 const cookieOptions = {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "lax" as const
+    sameSite: "none" as const
 };
 
 const ACCESS_TOKEN_MAX_AGE = 15 * 60 * 1000; // 15 mins (900,000 ms)
