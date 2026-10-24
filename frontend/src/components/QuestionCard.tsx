@@ -1,9 +1,6 @@
 import '../styles/questionCard.styles.css';
+import type { QuestionCardProps } from '../types/poll.types';
 
-type QuestionCardProps = {
-  form: any;
-  index: number;
-};
 
 export default function QuestionCard({
   form,

@@ -3,8 +3,8 @@ import ApiError from '../../common/utils/APIError.utils.js';
 import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from '../../common/utils/jwt.utils.js';
 import bcrypt from "bcrypt";
 import type { LoginInput, RegisterInput } from "./auth.types.js";
+import { SaltRounds } from '../../common/constants/contant.js';
 
-const SaltRounds = Number(process.env.SALTROUNDS) || 10;
 
 const register = async ({ username, email, password }: RegisterInput) => {
 

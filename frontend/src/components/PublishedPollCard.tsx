@@ -1,10 +1,8 @@
 import { useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
-import type { PublishedPoll } from '../types/poll.types'
+import type { PublishedPollCardProps } from '../types/poll.types'
 
-interface PublishedPollCardProps {
-    poll: PublishedPoll
-}
+
 
 export default function PublishedPollCard({ poll }: PublishedPollCardProps) {
     const navigate = useNavigate()
@@ -40,10 +38,10 @@ export default function PublishedPollCard({ poll }: PublishedPollCardProps) {
 
     const formattedExpiry = poll.expiresAt
         ? new Date(poll.expiresAt).toLocaleDateString('en-US', {
-              month: 'short',
-              day: 'numeric',
-              year: 'numeric',
-          })
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric',
+        })
         : null
 
     const creatorName = poll.creator?.username || 'Community Member'

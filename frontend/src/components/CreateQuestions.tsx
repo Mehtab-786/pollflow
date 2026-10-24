@@ -1,11 +1,8 @@
 import { defaultQuestion } from "../pages/CreatePoll";
 import QuestionCard from "./QuestionCard";
 import "../styles/createPoll.styles.css";
+import type { CreateQuestionsProps } from "../types/poll.types";
 
-type CreateQuestionsProps = {
-    form: any;
-    onBack: () => void;
-};
 
 export default function CreateQuestions({
     form,

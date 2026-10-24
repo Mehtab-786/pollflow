@@ -1,15 +1,7 @@
 import { sendResponse } from '../../common/utils/APIResponse.utils.js';
 import type { Request, Response } from "express";
 import * as authService from './auth.service.js'
-
-const cookieOptions = {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "none" as const
-};
-
-const ACCESS_TOKEN_MAX_AGE = 15 * 60 * 1000; // 15 mins (900,000 ms)
-const REFRESH_TOKEN_MAX_AGE = 7 * 24 * 60 * 60 * 1000; // 7 days (604,800,000 ms)
+import { ACCESS_TOKEN_MAX_AGE, cookieOptions, REFRESH_TOKEN_MAX_AGE } from '../../common/constants/contant.js';
 
 const register = async (req: Request, res: Response) => {
 

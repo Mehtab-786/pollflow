@@ -1,9 +1,5 @@
 import "../styles/createPoll.styles.css";
-
-type CreatePollDetailsProps = {
-    form: any;
-    onNext: () => void;
-};
+import type { CreatePollDetailsProps } from "../types/poll.types";
 
 export default function CreatePollDetails({
     form,

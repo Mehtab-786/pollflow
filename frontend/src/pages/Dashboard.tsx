@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query"
 import { Link } from "@tanstack/react-router"
 import { getMyPolls } from "../services/poll.service"
 import PollCard from "../components/PollCard"
-import type { PollItem } from "../components/PollCard"
+import type { PollItem } from "../types/poll.types"
 import "../styles/dashboard.styles.css"
 
 export default function Dashboard() {

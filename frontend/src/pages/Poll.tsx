@@ -5,41 +5,9 @@ import { useAuthStore } from '../store/auth.store'
 import '../styles/poll.styles.css'
 import { submitPollResponse } from '../services/response.service'
 import { toast } from 'sonner'
+import type { PollData } from '../types/poll.types'
 
-export interface OptionData {
-    id: string
-    text: string
-    votesCount?: number
-}
 
-export interface QuestionData {
-    id: string
-    question: string
-    position: number
-    isRequired: boolean
-    type: string
-    selectionMode: string
-    options: OptionData[]
-}
-
-export interface PollData {
-    id: string
-    title: string
-    type: string
-    responseMode: string
-    expiresAt: string | null
-    isPublished: boolean
-    isExpired: boolean
-    isCreator: boolean
-    createdAt: string
-    creator: {
-        id: string
-        username: string
-        email: string
-    }
-    totalResponses?: number
-    questions: QuestionData[]
-}
 
 export default function Poll() {
     const { pollId } = useParams({ from: '/polls/$pollId' })

@@ -4,42 +4,8 @@ import { getPollAnalytics } from '../services/poll.service'
 import { refreshAuthToken } from '../services/api/axios'
 import { socket } from '../socket/socket'
 import '../styles/poll.styles.css'
+import type { AnalyticsData } from '../types/poll.types'
 
-export interface AnalyticsOption {
-    id: string
-    text: string
-    votes: number
-    votesCount: number
-    percentage: number
-}
-
-export interface AnalyticsQuestion {
-    id: string
-    question: string
-    position: number
-    isRequired: boolean
-    type: string
-    selectionMode: string
-    totalVotes: number
-    totalAnswers?: number
-    options: AnalyticsOption[]
-}
-
-export interface AnalyticsData {
-    id: string
-    title: string
-    type: string
-    responseMode: string
-    expiresAt: string | null
-    isPublished: boolean
-    createdAt: string
-    creator: {
-        id: string
-        username: string
-    }
-    totalResponses: number
-    questions: AnalyticsQuestion[]
-}
 
 export default function Analytics() {
     const { pollId } = useParams({ from: '/_app/_authenticated/analytics/$pollId' })

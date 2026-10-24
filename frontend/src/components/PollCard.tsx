@@ -3,19 +3,8 @@ import { useNavigate } from "@tanstack/react-router"
 import { useQueryClient } from "@tanstack/react-query"
 import { publishPoll } from "../services/poll.service"
 import { toast } from "sonner"
+import type { PollCardProps } from "../types/poll.types"
 
-export interface PollItem {
-    id: string
-    title: string
-    type: string
-    isPublished: boolean
-    createdAt: string
-    expiresAt?: string | null
-}
-
-interface PollCardProps {
-    poll: PollItem
-}
 
 export default function PollCard({ poll }: PollCardProps) {
     const navigate = useNavigate()

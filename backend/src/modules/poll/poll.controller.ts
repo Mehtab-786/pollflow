@@ -111,5 +111,3 @@ const getPollAnalytics = async (req: Request, res: Response) => {
 
 
 export { createPoll, getPublishedPolls, getMyPolls, getPollById, publishPoll, getPollAnalytics };
-
-
