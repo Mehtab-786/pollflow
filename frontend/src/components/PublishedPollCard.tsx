@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import type { PublishedPollCardProps } from '../types/poll.types'
+import { copyToClipboard } from '../utils/clipboard'
 
 
 
@@ -18,21 +19,10 @@ export default function PublishedPollCard({ poll }: PublishedPollCardProps) {
     const handleCopyLink = async (e: React.MouseEvent) => {
         e.stopPropagation()
         const url = `${window.location.origin}/polls/${poll.id}`
-        try {
-            if (navigator?.clipboard?.writeText) {
-                await navigator.clipboard.writeText(url)
-            } else {
-                const textArea = document.createElement('textarea')
-                textArea.value = url
-                document.body.appendChild(textArea)
-                textArea.select()
-                document.execCommand('copy')
-                document.body.removeChild(textArea)
-            }
+        const success = await copyToClipboard(url)
+        if (success) {
             setCopied(true)
             setTimeout(() => setCopied(false), 2000)
-        } catch (err) {
-            console.error('Failed to copy link:', err)
         }
     }
 

@@ -4,6 +4,7 @@ import { useQueryClient } from "@tanstack/react-query"
 import { publishPoll } from "../services/poll.service"
 import { toast } from "sonner"
 import type { PollCardProps } from "../types/poll.types"
+import { copyToClipboard } from "../utils/clipboard"
 
 
 export default function PollCard({ poll }: PollCardProps) {
@@ -42,23 +43,12 @@ export default function PollCard({ poll }: PollCardProps) {
 
     const handleCopyShareUrl = async () => {
         const url = `${window.location.origin}/polls/${poll.id}`
-        try {
-            if (navigator?.clipboard?.writeText) {
-                await navigator.clipboard.writeText(url)
-            } else {
-                const textArea = document.createElement("textarea")
-                textArea.value = url
-                document.body.appendChild(textArea)
-                textArea.select()
-                document.execCommand("copy")
-                document.body.removeChild(textArea)
-            }
+        const success = await copyToClipboard(url)
+        if (success) {
             setIsCopied(true)
             setTimeout(() => {
                 setIsCopied(false)
             }, 2000)
-        } catch (err) {
-            console.error("Failed to copy poll link:", err)
         }
     }
 

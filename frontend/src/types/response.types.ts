@@ -10,11 +10,6 @@ export interface SubmitPollResponsePayload {
 }
 
 
-export interface SubmitAnswerPayload {
-    questionId: string;
-    optionId: string | null;
-}
-
 export interface SubmitResponsePayload {
-    answers: SubmitAnswerPayload[];
+    answers: SubmitAnswerInput[];
 }

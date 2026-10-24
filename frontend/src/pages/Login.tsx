@@ -2,7 +2,7 @@ import { useState } from "react"
 import * as authService from '../services/auth.service'
 import { useAuthStore } from "../store/auth.store"
 import { useNavigate, useSearch } from "@tanstack/react-router"
-import '../styles/login.styles.css'
+import '../styles/auth.styles.css'
 import { toast } from "sonner"
 
 export default function Login() {

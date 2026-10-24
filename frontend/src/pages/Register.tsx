@@ -3,7 +3,7 @@ import * as authService from '../services/auth.service'
 import { useAuthStore } from "../store/auth.store"
 import { useNavigate, useSearch } from "@tanstack/react-router"
 import { toast } from "sonner"
-import '../styles/register.styles.css'
+import '../styles/auth.styles.css'
 
 export default function Register() {
     const [username, setUsername] = useState('')

@@ -3,19 +3,17 @@ import type { Request, Response } from "express";
 import * as authService from './auth.service.js'
 import { ACCESS_TOKEN_MAX_AGE, cookieOptions, REFRESH_TOKEN_MAX_AGE } from '../../common/constants/contant.js';
 
+
+const setAuthCookies = (res: Response, accessToken: string, refreshToken: string) => {
+    res.cookie("accessToken", accessToken, { ...cookieOptions, maxAge: ACCESS_TOKEN_MAX_AGE });
+    res.cookie("refreshToken", refreshToken, { ...cookieOptions, maxAge: REFRESH_TOKEN_MAX_AGE });
+};
+
 const register = async (req: Request, res: Response) => {
 
     const { user, accessToken, refreshToken } = await authService.register(req.body);
 
-    res.cookie("accessToken", accessToken, {
-        ...cookieOptions,
-        maxAge: ACCESS_TOKEN_MAX_AGE,
-    });
-
-    res.cookie("refreshToken", refreshToken, {
-        ...cookieOptions,
-        maxAge: REFRESH_TOKEN_MAX_AGE,
-    });
+    setAuthCookies(res, accessToken, refreshToken)
 
     sendResponse(res, 201, 'Registration successful', user)
 };
@@ -23,16 +21,7 @@ const register = async (req: Request, res: Response) => {
 const login = async (req: Request, res: Response) => {
     const { user, accessToken, refreshToken } = await authService.login(req.body);
 
-    res.cookie("accessToken", accessToken, {
-        ...cookieOptions,
-        maxAge: ACCESS_TOKEN_MAX_AGE,
-    });
-
-    res.cookie("refreshToken", refreshToken, {
-        ...cookieOptions,
-        maxAge: REFRESH_TOKEN_MAX_AGE,
-    });
-
+    setAuthCookies(res, accessToken, refreshToken)
     return sendResponse(
         res,
         200,
@@ -49,15 +38,7 @@ const refresh = async (req: Request, res: Response) => {
     const { accessToken, refreshToken } = await authService.refresh(token);
 
     // 3. Set updated cookies
-    res.cookie("accessToken", accessToken, {
-        ...cookieOptions,
-        maxAge: ACCESS_TOKEN_MAX_AGE,
-    });
-
-    res.cookie("refreshToken", refreshToken, {
-        ...cookieOptions,
-        maxAge: REFRESH_TOKEN_MAX_AGE,
-    });
+    setAuthCookies(res, accessToken, refreshToken)
 
     return sendResponse(res, 200, "Token refreshed successfully", null);
 };
@@ -76,3 +57,4 @@ const me = async (req: Request, res: Response) => {
 };
 
 export { register, login, logout, refresh, me };
+
