@@ -22,3 +22,19 @@ export interface POLL {
     questions: QUESTIONS[];
 }
 
+export interface PublishedPoll {
+    id: string;
+    title: string;
+    type: string;
+    createdAt: string;
+    expiresAt: string | null;
+    creator?: {
+        id: string;
+        username: string;
+    } | null;
+    _count?: {
+        questions: number;
+        responses: number;
+    };
+}
+

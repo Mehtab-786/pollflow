@@ -1,7 +1,9 @@
 import { useState } from "react"
 import * as authService from '../services/auth.service'
 import { useAuthStore } from "../store/auth.store"
-import { useNavigate } from "@tanstack/react-router"
+import { useNavigate, useSearch } from "@tanstack/react-router"
+import '../styles/login.styles.css'
+import { toast } from "sonner"
 
 export default function Login() {
     const [email, setEmail] = useState('')
@@ -10,6 +12,8 @@ export default function Login() {
     const [error, setError] = useState('')
 
     const navigate = useNavigate()
+    const search = useSearch({ strict: false }) as { returnTo?: string; redirect?: string }
+    const returnTo = search?.returnTo || search?.redirect
     const { login } = useAuthStore()
 
     const handleSubmit = async (e: React.SubmitEvent) => {
@@ -22,53 +26,57 @@ export default function Login() {
 
             if (success) {
                 login(data)
-                navigate({ to: '/' })
+                toast.success(`Welcome back, ${data.username}!`)
+                navigate({ to: (returnTo || '/') as any })
             }
         } catch (err) {
             setError('Invalid Email or password')
+            // toast.error('Invalid Email or password')
         } finally {
             setIsLoading(false)
         }
     }
 
     return (
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
-            <form
-                onSubmit={handleSubmit}
-                style={{ width: '100%', maxWidth: '380px', padding: '24px', border: '1px solid #ccc', borderRadius: '8px' }}
-            >
-                <h1 style={{ textAlign: 'center', marginBottom: '20px' }}>Sign In</h1>
+        <div className="login-page">
+            <form onSubmit={handleSubmit} className="login-card">
+                <div className="login-header">
+                    <h1 className="login-title">Sign In</h1>
+                    <p className="login-subtitle">Welcome back! Please enter your details</p>
+                </div>
 
                 {error && (
-                    <div style={{ color: '#d32f2f', marginBottom: '16px', padding: '8px', border: '1px solid #d32f2f', borderRadius: '4px', backgroundColor: '#ffebee' }}>
+                    <div className="login-error">
                         {error}
                     </div>
                 )}
 
-                <div style={{ marginBottom: '16px' }}>
-                    <label htmlFor="email" style={{ display: 'block', marginBottom: '6px' }}>
+                <div className="login-field">
+                    <label htmlFor="email" className="login-label">
                         Email
                     </label>
                     <input
                         id="email"
                         type="email"
                         value={email}
+                        placeholder="Enter your email"
                         onChange={(e) => setEmail(e.target.value)}
-                        style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }}
+                        className="login-input"
                         required
                     />
                 </div>
 
-                <div style={{ marginBottom: '20px' }}>
-                    <label htmlFor="password" style={{ display: 'block', marginBottom: '6px' }}>
+                <div className="login-field">
+                    <label htmlFor="password" className="login-label">
                         Password
                     </label>
                     <input
                         id="password"
                         type="password"
                         value={password}
+                        placeholder="••••••••"
                         onChange={(e) => setPassword(e.target.value)}
-                        style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }}
+                        className="login-input"
                         required
                     />
                 </div>
@@ -76,23 +84,15 @@ export default function Login() {
                 <button
                     type="submit"
                     disabled={isLoading}
-                    style={{ width: '100%', padding: '10px', cursor: isLoading ? 'not-allowed' : 'pointer' }}
+                    className="login-btn-primary"
                 >
                     {isLoading ? 'Signing in...' : 'Sign In'}
                 </button>
 
                 <button
                     type="button"
-                    onClick={() => navigate({ to: '/register' })}
-                    style={{
-                        width: '100%',
-                        marginTop: '10px',
-                        padding: '10px',
-                        cursor: 'pointer',
-                        backgroundColor: 'transparent',
-                        border: '1px solid #ccc',
-                        borderRadius: '4px'
-                    }}
+                    onClick={() => navigate({ to: '/register', search: returnTo ? { returnTo } : undefined })}
+                    className="login-btn-secondary"
                 >
                     Don't have an account? Sign Up
                 </button>

@@ -1,5 +1,5 @@
 import type { AuthResponse, LoginCredentials, RegisterCredentials } from "../types/auth.types";
-import { apiClient } from "./api/axios";
+import { apiClient, refreshAuthToken } from "./api/axios";
 import { useAuthStore } from "../store/auth.store";
 
 export const login = async (credentials: LoginCredentials): Promise<AuthResponse> => {
@@ -23,7 +23,7 @@ export const getCurrentUser = async (): Promise<AuthResponse> => {
 };
 
 export const refreshToken = async (): Promise<void> => {
-    await apiClient.post("/auth/refresh");
+    await refreshAuthToken();
 };
 
 // Singleton promise to prevent concurrent duplicate initializations (e.g. React StrictMode)
@@ -38,38 +38,26 @@ export const initializeAuth = async (): Promise<void> => {
         const { login, logout, setInitialized } = useAuthStore.getState();
 
         try {
-            // 1. Attempt to fetch current user with existing access token cookie
+            // Attempt to fetch current user. If access token is expired,
+            // the Axios response interceptor automatically handles /auth/refresh and retries.
             const response = await getCurrentUser();
             if (response?.success && response?.data) {
                 login(response.data);
                 return;
             }
+            logout();
         } catch {
-            // 2. Access token may be expired or missing; attempt refreshing tokens
-            try {
-                await refreshToken();
-                // 3. If refresh succeeded, retry fetching current user with new access cookie
-                const retryResponse = await getCurrentUser();
-
-                if (retryResponse?.success && retryResponse?.data) {
-                    login(retryResponse.data);
-                    return;
-                }
-            } catch {
-                // Refresh token also missing or expired; clear auth state
-                logout();
-                return;
-            }
+            // Session missing, expired, or refresh token invalid
+            logout();
         } finally {
             setInitialized(true);
         }
-
-        logout();
     })().finally(() => {
         initPromise = null;
     });
 
     return initPromise;
 };
+
 
 

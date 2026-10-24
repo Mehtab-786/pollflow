@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import "../styles/home.styles.css";
 
 export default function Home() {
@@ -14,8 +15,12 @@ export default function Home() {
                     PollFlow is a focused polling platform — create, publish, and analyze responses in minutes. No noise, just answers.
                 </p>
                 <div className="hero-actions">
-                    <p className="btn btn-primary">Create a Poll</p>
-                    <p className="btn btn-outline">View Dashboard</p>
+                    <Link to="/create-poll" className="btn btn-primary" style={{ textDecoration: 'none' }}>
+                        Create a Poll
+                    </Link>
+                    <Link to="/dashboard" className="btn btn-outline" style={{ textDecoration: 'none' }}>
+                        View Dashboard
+                    </Link>
                 </div>
             </section>
 
@@ -94,7 +99,9 @@ export default function Home() {
                 <p className="cta-subtitle">
                     Set up your first poll in seconds and start collecting meaningful feedback immediately.
                 </p>
-                <p className="btn btn-light">Create Poll Now</p>
+                <Link className="btn btn-light" to="/create-poll" style={{ textDecoration: 'none' }}>
+                    Create Poll Now
+                </Link>
             </section>
 
         </div>

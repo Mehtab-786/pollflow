@@ -272,3 +272,9 @@
   border-color: #ef4444;
   background-color: #fef2f2;
 }
+
+.error {
+  color: #ef4444;
+  font-size: 13px;
+  margin-top: 4px;
+}

@@ -1,7 +1,9 @@
 import { useState } from "react"
 import * as authService from '../services/auth.service'
 import { useAuthStore } from "../store/auth.store"
-import { useNavigate } from "@tanstack/react-router"
+import { useNavigate, useSearch } from "@tanstack/react-router"
+import { toast } from "sonner"
+import '../styles/register.styles.css'
 
 export default function Register() {
     const [username, setUsername] = useState('')
@@ -11,6 +13,8 @@ export default function Register() {
     const [error, setError] = useState('')
 
     const navigate = useNavigate()
+    const search = useSearch({ strict: false }) as { returnTo?: string; redirect?: string }
+    const returnTo = search?.returnTo || search?.redirect
     const { login } = useAuthStore()
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -23,7 +27,8 @@ export default function Register() {
 
             if (success) {
                 login(data)
-                navigate({ to: '/' })
+                toast.success(`Account created successfully! Welcome, ${data.username}!`)
+                navigate({ to: (returnTo || '/') as any })
             }
         } catch (err) {
             setError('Registration failed. Please check your credentials.')
@@ -33,57 +38,60 @@ export default function Register() {
     }
 
     return (
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
-            <form
-                onSubmit={handleSubmit}
-                style={{ width: '100%', maxWidth: '380px', padding: '24px', border: '1px solid #ccc', borderRadius: '8px' }}
-            >
-                <h1 style={{ textAlign: 'center', marginBottom: '20px' }}>Sign Up</h1>
+        <div className="auth-page">
+            <form onSubmit={handleSubmit} className="auth-card">
+                <div className="auth-header">
+                    <h1 className="auth-title">Sign Up</h1>
+                    <p className="auth-subtitle">Create your account to get started</p>
+                </div>
 
                 {error && (
-                    <div style={{ color: '#d32f2f', marginBottom: '16px', padding: '8px', border: '1px solid #d32f2f', borderRadius: '4px', backgroundColor: '#ffebee' }}>
+                    <div className="auth-error">
                         {error}
                     </div>
                 )}
 
-                <div style={{ marginBottom: '16px' }}>
-                    <label htmlFor="username" style={{ display: 'block', marginBottom: '6px' }}>
+                <div className="auth-field">
+                    <label htmlFor="username" className="auth-label">
                         Username
                     </label>
                     <input
                         id="username"
                         type="text"
                         value={username}
+                        placeholder="Enter your username"
                         onChange={(e) => setUsername(e.target.value)}
-                        style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }}
+                        className="auth-input"
                         required
                     />
                 </div>
 
-                <div style={{ marginBottom: '16px' }}>
-                    <label htmlFor="email" style={{ display: 'block', marginBottom: '6px' }}>
+                <div className="auth-field">
+                    <label htmlFor="email" className="auth-label">
                         Email
                     </label>
                     <input
                         id="email"
                         type="email"
                         value={email}
+                        placeholder="Enter your email"
                         onChange={(e) => setEmail(e.target.value)}
-                        style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }}
+                        className="auth-input"
                         required
                     />
                 </div>
 
-                <div style={{ marginBottom: '20px' }}>
-                    <label htmlFor="password" style={{ display: 'block', marginBottom: '6px' }}>
+                <div className="auth-field">
+                    <label htmlFor="password" className="auth-label">
                         Password
                     </label>
                     <input
                         id="password"
                         type="password"
                         value={password}
+                        placeholder="••••••••"
                         onChange={(e) => setPassword(e.target.value)}
-                        style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }}
+                        className="auth-input"
                         required
                     />
                 </div>
@@ -91,23 +99,15 @@ export default function Register() {
                 <button
                     type="submit"
                     disabled={isLoading}
-                    style={{ width: '100%', padding: '10px', cursor: isLoading ? 'not-allowed' : 'pointer' }}
+                    className="auth-btn-primary"
                 >
                     {isLoading ? 'Signing up...' : 'Sign Up'}
                 </button>
 
                 <button
                     type="button"
-                    onClick={() => navigate({ to: '/login' })}
-                    style={{
-                        width: '100%',
-                        marginTop: '10px',
-                        padding: '10px',
-                        cursor: 'pointer',
-                        backgroundColor: 'transparent',
-                        border: '1px solid #ccc',
-                        borderRadius: '4px'
-                    }}
+                    onClick={() => navigate({ to: '/login', search: returnTo ? { returnTo } : undefined })}
+                    className="auth-btn-secondary"
                 >
                     Already have an account? Sign In
                 </button>

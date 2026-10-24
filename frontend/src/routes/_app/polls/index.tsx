@@ -1,9 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
+import PublishedPolls from '../../../pages/PublishedPolls'
 
 export const Route = createFileRoute('/_app/polls/')({
-  component: RouteComponent,
+  component: PublishedPolls,
 })
 
-function RouteComponent() {
-  return <div>Hello "/polls/"!</div>
-}

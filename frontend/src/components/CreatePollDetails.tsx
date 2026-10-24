@@ -13,11 +13,11 @@ export default function CreatePollDetails({
     const handleNext = async () => {
         const title = form.getFieldValue("title");
 
-        if (!title || title.trim().length < 3) {
+        if (!title || title.trim().length < 5) {
             form.setFieldMeta("title", (meta: any) => ({
                 ...meta,
                 isTouched: true,
-                errors: ["Title must be at least 3 characters"],
+                errors: ["Title must be at least 5 characters"],
             }));
             return;
         }
@@ -43,8 +43,8 @@ export default function CreatePollDetails({
                     name="title"
                     validators={{
                         onChange: ({ value }: any) =>
-                            !value || value.trim().length < 3
-                                ? "Title must be at least 3 characters"
+                            !value || value.trim().length < 5
+                                ? "Title must be at least 5 characters"
                                 : undefined,
                     }}
                     children={(field: any) => (

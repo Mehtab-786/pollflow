@@ -1,0 +1,218 @@
+/* ── Question Card Component Styling ────────────────────────── */
+
+.question-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px -2px rgba(15, 23, 42, 0.05), 0 1px 3px -1px rgba(15, 23, 42, 0.03);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  box-sizing: border-box;
+}
+
+.question-card:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 14px -3px rgba(15, 23, 42, 0.08);
+}
+
+/* Header */
+.question-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.question-card-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  letter-spacing: -0.01em;
+}
+
+.question-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #eef2ff;
+  color: #4f46e5;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+  letter-spacing: 0.02em;
+}
+
+/* Form Fields */
+.question-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 18px;
+}
+
+.question-field-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+@media (max-width: 580px) {
+  .question-field-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+}
+
+.question-label {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #334155;
+  letter-spacing: -0.01em;
+}
+
+/* Inputs and Selects */
+.question-input,
+.question-select {
+  width: 100%;
+  height: 42px;
+  padding: 0 14px;
+  font-family: inherit;
+  font-size: 14px;
+  color: #0f172a;
+  background-color: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-radius: 9px;
+  outline: none;
+  box-sizing: border-box;
+  transition: all 0.2s ease-in-out;
+}
+
+.question-input::placeholder {
+  color: #94a3b8;
+}
+
+.question-input:hover,
+.question-select:hover {
+  border-color: #94a3b8;
+  background-color: #ffffff;
+}
+
+.question-input:focus,
+.question-select:focus {
+  background-color: #ffffff;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+.question-select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 16px;
+  padding-right: 38px;
+}
+
+/* Checkbox */
+.question-checkbox-group {
+  margin-bottom: 20px;
+}
+
+.question-checkbox-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  cursor: pointer;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #334155;
+  user-select: none;
+}
+
+.question-checkbox {
+  width: 17px;
+  height: 17px;
+  cursor: pointer;
+  accent-color: #6366f1;
+  border-radius: 4px;
+  margin: 0;
+}
+
+/* Options Section */
+.question-options-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.question-options-label {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #334155;
+  letter-spacing: -0.01em;
+  margin-bottom: 2px;
+}
+
+.question-option-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.question-option-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.question-option-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 40px;
+  min-width: 34px;
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 13px;
+  font-weight: 700;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+}
+
+.question-option-row:focus-within .question-option-badge {
+  background: #eef2ff;
+  color: #4f46e5;
+  border-color: #c7d2fe;
+}
+
+.question-option-input {
+  flex: 1;
+  height: 40px;
+}
+
+/* Error States */
+.question-input.has-error,
+.question-select.has-error {
+  border-color: #ef4444;
+  background-color: #fef2f2;
+}
+
+.question-error,
+.error {
+  font-size: 12px;
+  font-weight: 500;
+  color: #ef4444;
+  margin-top: 4px;
+}

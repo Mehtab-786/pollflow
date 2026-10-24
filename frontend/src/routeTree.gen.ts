@@ -14,10 +14,10 @@ import { Route as authLoginRouteImport } from './routes/(auth)/login'
 import { Route as authRegisterRouteImport } from './routes/(auth)/register'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
 import { Route as AppAuthenticatedRouteRouteImport } from './routes/_app/_authenticated/route'
+import { Route as PollsPollIdRouteImport } from './routes/polls.$pollId'
 import { Route as AppAuthenticatedCreatePollRouteImport } from './routes/_app/_authenticated/create-poll'
 import { Route as AppAuthenticatedDashboardRouteImport } from './routes/_app/_authenticated/dashboard'
 import { Route as AppPollsIndexRouteImport } from './routes/_app/polls/index'
-import { Route as AppPollsPollIdRouteImport } from './routes/_app/polls/$pollId'
 import { Route as AppAuthenticatedAnalyticsPollIdRouteImport } from './routes/_app/_authenticated/analytics/$pollId'
 
 const AppRouteRoute = AppRouteRouteImport.update({
@@ -43,6 +43,11 @@ const AppAuthenticatedRouteRoute = AppAuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const PollsPollIdRoute = PollsPollIdRouteImport.update({
+  id: '/polls/$pollId',
+  path: '/polls/$pollId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppAuthenticatedCreatePollRoute =
   AppAuthenticatedCreatePollRouteImport.update({
     id: '/create-poll',
@@ -60,11 +65,6 @@ const AppPollsIndexRoute = AppPollsIndexRouteImport.update({
   path: '/polls/',
   getParentRoute: () => AppRouteRoute,
 } as any)
-const AppPollsPollIdRoute = AppPollsPollIdRouteImport.update({
-  id: '/polls/$pollId',
-  path: '/polls/$pollId',
-  getParentRoute: () => AppRouteRoute,
-} as any)
 const AppAuthenticatedAnalyticsPollIdRoute =
   AppAuthenticatedAnalyticsPollIdRouteImport.update({
     id: '/analytics/$pollId',
@@ -76,9 +76,9 @@ export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
   '/login': typeof authLoginRoute
   '/register': typeof authRegisterRoute
+  '/polls/$pollId': typeof PollsPollIdRoute
   '/create-poll': typeof AppAuthenticatedCreatePollRoute
   '/dashboard': typeof AppAuthenticatedDashboardRoute
-  '/polls/$pollId': typeof AppPollsPollIdRoute
   '/polls/': typeof AppPollsIndexRoute
   '/analytics/$pollId': typeof AppAuthenticatedAnalyticsPollIdRoute
 }
@@ -86,9 +86,9 @@ export interface FileRoutesByTo {
   '/': typeof AppIndexRoute
   '/login': typeof authLoginRoute
   '/register': typeof authRegisterRoute
+  '/polls/$pollId': typeof PollsPollIdRoute
   '/create-poll': typeof AppAuthenticatedCreatePollRoute
   '/dashboard': typeof AppAuthenticatedDashboardRoute
-  '/polls/$pollId': typeof AppPollsPollIdRoute
   '/polls': typeof AppPollsIndexRoute
   '/analytics/$pollId': typeof AppAuthenticatedAnalyticsPollIdRoute
 }
@@ -98,10 +98,10 @@ export interface FileRoutesById {
   '/_app/_authenticated': typeof AppAuthenticatedRouteRouteWithChildren
   '/(auth)/login': typeof authLoginRoute
   '/(auth)/register': typeof authRegisterRoute
+  '/polls/$pollId': typeof PollsPollIdRoute
   '/_app/': typeof AppIndexRoute
   '/_app/_authenticated/create-poll': typeof AppAuthenticatedCreatePollRoute
   '/_app/_authenticated/dashboard': typeof AppAuthenticatedDashboardRoute
-  '/_app/polls/$pollId': typeof AppPollsPollIdRoute
   '/_app/polls/': typeof AppPollsIndexRoute
   '/_app/_authenticated/analytics/$pollId': typeof AppAuthenticatedAnalyticsPollIdRoute
 }
@@ -111,9 +111,9 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/register'
+    | '/polls/$pollId'
     | '/create-poll'
     | '/dashboard'
-    | '/polls/$pollId'
     | '/polls/'
     | '/analytics/$pollId'
   fileRoutesByTo: FileRoutesByTo
@@ -121,9 +121,9 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/register'
+    | '/polls/$pollId'
     | '/create-poll'
     | '/dashboard'
-    | '/polls/$pollId'
     | '/polls'
     | '/analytics/$pollId'
   id:
@@ -132,10 +132,10 @@ export interface FileRouteTypes {
     | '/_app/_authenticated'
     | '/(auth)/login'
     | '/(auth)/register'
+    | '/polls/$pollId'
     | '/_app/'
     | '/_app/_authenticated/create-poll'
     | '/_app/_authenticated/dashboard'
-    | '/_app/polls/$pollId'
     | '/_app/polls/'
     | '/_app/_authenticated/analytics/$pollId'
   fileRoutesById: FileRoutesById
@@ -144,6 +144,7 @@ export interface RootRouteChildren {
   AppRouteRoute: typeof AppRouteRouteWithChildren
   authLoginRoute: typeof authLoginRoute
   authRegisterRoute: typeof authRegisterRoute
+  PollsPollIdRoute: typeof PollsPollIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -183,6 +184,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAuthenticatedRouteRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/polls/$pollId': {
+      id: '/polls/$pollId'
+      path: '/polls/$pollId'
+      fullPath: '/polls/$pollId'
+      preLoaderRoute: typeof PollsPollIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_app/_authenticated/create-poll': {
       id: '/_app/_authenticated/create-poll'
       path: '/create-poll'
@@ -202,13 +210,6 @@ declare module '@tanstack/react-router' {
       path: '/polls'
       fullPath: '/polls/'
       preLoaderRoute: typeof AppPollsIndexRouteImport
-      parentRoute: typeof AppRouteRoute
-    }
-    '/_app/polls/$pollId': {
-      id: '/_app/polls/$pollId'
-      path: '/polls/$pollId'
-      fullPath: '/polls/$pollId'
-      preLoaderRoute: typeof AppPollsPollIdRouteImport
       parentRoute: typeof AppRouteRoute
     }
     '/_app/_authenticated/analytics/$pollId': {
@@ -241,14 +242,12 @@ const AppAuthenticatedRouteRouteWithChildren =
 interface AppRouteRouteChildren {
   AppAuthenticatedRouteRoute: typeof AppAuthenticatedRouteRouteWithChildren
   AppIndexRoute: typeof AppIndexRoute
-  AppPollsPollIdRoute: typeof AppPollsPollIdRoute
   AppPollsIndexRoute: typeof AppPollsIndexRoute
 }
 
 const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppAuthenticatedRouteRoute: AppAuthenticatedRouteRouteWithChildren,
   AppIndexRoute: AppIndexRoute,
-  AppPollsPollIdRoute: AppPollsPollIdRoute,
   AppPollsIndexRoute: AppPollsIndexRoute,
 }
 
@@ -260,6 +259,7 @@ const rootRouteChildren: RootRouteChildren = {
   AppRouteRoute: AppRouteRouteWithChildren,
   authLoginRoute: authLoginRoute,
   authRegisterRoute: authRegisterRoute,
+  PollsPollIdRoute: PollsPollIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

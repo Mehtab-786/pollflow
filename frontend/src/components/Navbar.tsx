@@ -46,24 +46,24 @@ export default function Navbar() {
                 <nav className="navbar-menu">
                     <ul className="navbar-links">
                         <li>
-                            <Link to="/" activeProps={{ className: 'active' }} className="nav-link">
+                            <Link to="/" activeOptions={{ exact: true }} activeProps={{ className: 'active' }} className="nav-link">
                                 Home
                             </Link>
                         </li>
                         <li>
-                            <Link to="/polls" activeProps={{ className: 'active' }} className="nav-link">
+                            <Link to="/polls" activeOptions={{ exact: true }} activeProps={{ className: 'active' }} className="nav-link">
                                 Published Polls
                             </Link>
                         </li>
                         {isAuthenticated && (
                             <>
                                 <li>
-                                    <Link to="/create-poll" activeProps={{ className: 'active' }} className="nav-link">
+                                    <Link to="/create-poll" activeOptions={{ exact: true }} activeProps={{ className: 'active' }} className="nav-link">
                                         Create Poll
                                     </Link>
                                 </li>
                                 <li>
-                                    <Link to="/dashboard" activeProps={{ className: 'active' }} className="nav-link">
+                                    <Link to="/dashboard" activeOptions={{ exact: true }} activeProps={{ className: 'active' }} className="nav-link">
                                         Dashboard
                                     </Link>
                                 </li>

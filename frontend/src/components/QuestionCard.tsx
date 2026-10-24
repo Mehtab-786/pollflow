@@ -1,3 +1,4 @@
+import '../styles/questionCard.styles.css';
 
 type QuestionCardProps = {
   form: any;
@@ -9,16 +10,21 @@ export default function QuestionCard({
   index
 }: QuestionCardProps) {
   return (
-    <div style={{ border: "1px solid #ccc", padding: "16px", marginBottom: "16px" }}>
+    <div className="question-card">
       {/* Header */}
-      <h3>Question {index + 1}</h3>
+      <div className="question-card-header">
+        <h3 className="question-card-title">
+          <span>Question</span>
+          <span className="question-badge">#{index + 1}</span>
+        </h3>
+      </div>
 
       {/* Question Prompt */}
       <form.Field
         name={`questions[${index}].question`}
         children={(field: any) => (
-          <div>
-            <label htmlFor={field.name}>Question</label>
+          <div className="question-field-group">
+            <label className="question-label" htmlFor={field.name}>Question</label>
 
             <input
               id={field.name}
@@ -27,11 +33,11 @@ export default function QuestionCard({
               value={field.state.value}
               placeholder="Enter question"
               onChange={(e) => field.handleChange(e.target.value)}
-              style={{ width: "100%", padding: "6px" }}
+              className={`question-input ${field.state.meta.errors?.length ? 'has-error' : ''}`}
             />
 
             {field.state.meta.errors.map((error: any, i: number) => (
-              <div key={i} className="error">
+              <div key={i} className="error question-error">
                 {typeof error === "string" ? error : error?.message}
               </div>
             ))}
@@ -39,67 +45,62 @@ export default function QuestionCard({
         )}
       />
 
+      <div className="question-field-grid">
+        {/* Type */}
+        <form.Field
+          name={`questions[${index}].type`}
+          children={(field: any) => (
+            <div className="question-field-group">
+              <label className="question-label" htmlFor={field.name}>Type</label>
 
-      {/* Type */}
-      <form.Field
-        name={`questions[${index}].type`}
-        children={(field: any) => (
-          <div>
-            <label htmlFor={field.name}>Type</label>
+              <select
+                id={field.name}
+                name={field.name}
+                value={field.state.value}
+                onChange={(e) => field.handleChange(e.target.value)}
+                className="question-select"
+              >
+                <option value="MULTIPLE_CHOICE">Multiple Choice</option>
+                <option value="TEXT" disabled>Text (v2 - Coming soon)</option>
+              </select>
+            </div>
+          )}
+        />
 
-            <select
-              id={field.name}
-              name={field.name}
-              value={field.state.value}
-              onChange={(e) => field.handleChange(e.target.value)}
-              style={{ width: "100%", padding: "6px" }}
-            >
-              <option value="MULTIPLE_CHOICE">Multiple Choice</option>
-              <option value="TEXT" disabled>Text (v2 - Coming soon)</option>
-            </select>
-          </div>
-        )}
-      />
+        {/* Selection Mode */}
+        <form.Field
+          name={`questions[${index}].selectionMode`}
+          children={(field: any) => (
+            <div className="question-field-group">
+              <label className="question-label" htmlFor={field.name}>Selection Mode</label>
 
-      {/* Selection Mode */}
-      <form.Field
-        name={`questions[${index}].selectionMode`}
-        children={(field: any) => (
-          <div>
-            <label htmlFor={field.name}>Selection Mode</label>
-
-            <select
-              id={field.name}
-              name={field.name}
-              value={field.state.value}
-              onChange={(e) => field.handleChange(e.target.value)}
-              style={{ width: "100%", padding: "6px" }}
-            >
-              <option value="SINGLE">Single</option>
-              <option value="MULTIPLE" disabled> Multiple (v2 - Coming soon) </option>
-            </select>
-          </div>
-        )}
-      />
+              <select
+                id={field.name}
+                name={field.name}
+                value={field.state.value}
+                onChange={(e) => field.handleChange(e.target.value)}
+                className="question-select"
+              >
+                <option value="SINGLE">Single</option>
+                <option value="MULTIPLE" disabled> Multiple (v2 - Coming soon) </option>
+              </select>
+            </div>
+          )}
+        />
+      </div>
 
       {/* Required Checkbox */}
       <form.Field
         name={`questions[${index}].isRequired`}
         children={(field: any) => (
-          <div style={{ marginBottom: "12px" }}>
-            <label
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-              }}
-            >
+          <div className="question-checkbox-group">
+            <label className="question-checkbox-label">
               <input
                 type="checkbox"
                 checked={field.state.value}
                 onChange={(e) => field.handleChange(e.target.checked)}
+                className="question-checkbox"
               />
-
               Required
             </label>
           </div>
@@ -107,16 +108,16 @@ export default function QuestionCard({
       />
 
       {/* Options */}
-      <div>
-        <label>Options</label>
+      <div className="question-options-section">
+        <label className="question-options-label">Options</label>
 
         {/* Option A */}
         <form.Field
           name={`questions[${index}].options[0]`}
           children={(field: any) => (
-            <div style={{ marginTop: "8px" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                <span>A</span>
+            <div className="question-option-item">
+              <div className="question-option-row">
+                <span className="question-option-badge">A</span>
 
                 <input
                   id={field.name}
@@ -125,11 +126,11 @@ export default function QuestionCard({
                   value={field.state.value}
                   placeholder="Option A"
                   onChange={(e) => field.handleChange(e.target.value)}
-                  style={{ flex: 1, padding: "6px" }}
+                  className={`question-input question-option-input ${field.state.meta.errors?.length ? 'has-error' : ''}`}
                 />
               </div>
               {field.state.meta.errors.map((error: any, i: number) => (
-                <div key={i} className="error">
+                <div key={i} className="error question-error">
                   {typeof error === "string" ? error : error?.message}
                 </div>
               ))}
@@ -141,9 +142,9 @@ export default function QuestionCard({
         <form.Field
           name={`questions[${index}].options[1]`}
           children={(field: any) => (
-            <div style={{ marginTop: "8px" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                <span>B</span>
+            <div className="question-option-item">
+              <div className="question-option-row">
+                <span className="question-option-badge">B</span>
 
                 <input
                   id={field.name}
@@ -152,11 +153,11 @@ export default function QuestionCard({
                   value={field.state.value}
                   placeholder="Option B"
                   onChange={(e) => field.handleChange(e.target.value)}
-                  style={{ flex: 1, padding: "6px" }}
+                  className={`question-input question-option-input ${field.state.meta.errors?.length ? 'has-error' : ''}`}
                 />
               </div>
               {field.state.meta.errors.map((error: any, i: number) => (
-                <div key={i} className="error">
+                <div key={i} className="error question-error">
                   {typeof error === "string" ? error : error?.message}
                 </div>
               ))}
@@ -168,9 +169,9 @@ export default function QuestionCard({
         <form.Field
           name={`questions[${index}].options[2]`}
           children={(field: any) => (
-            <div style={{ marginTop: "8px" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                <span>C</span>
+            <div className="question-option-item">
+              <div className="question-option-row">
+                <span className="question-option-badge">C</span>
 
                 <input
                   id={field.name}
@@ -179,11 +180,11 @@ export default function QuestionCard({
                   value={field.state.value}
                   placeholder="Option C"
                   onChange={(e) => field.handleChange(e.target.value)}
-                  style={{ flex: 1, padding: "6px" }}
+                  className={`question-input question-option-input ${field.state.meta.errors?.length ? 'has-error' : ''}`}
                 />
               </div>
               {field.state.meta.errors.map((error: any, i: number) => (
-                <div key={i} className="error">
+                <div key={i} className="error question-error">
                   {typeof error === "string" ? error : error?.message}
                 </div>
               ))}
@@ -195,9 +196,9 @@ export default function QuestionCard({
         <form.Field
           name={`questions[${index}].options[3]`}
           children={(field: any) => (
-            <div style={{ marginTop: "8px" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                <span>D</span>
+            <div className="question-option-item">
+              <div className="question-option-row">
+                <span className="question-option-badge">D</span>
 
                 <input
                   id={field.name}
@@ -206,11 +207,11 @@ export default function QuestionCard({
                   value={field.state.value}
                   placeholder="Option D"
                   onChange={(e) => field.handleChange(e.target.value)}
-                  style={{ flex: 1, padding: "6px" }}
+                  className={`question-input question-option-input ${field.state.meta.errors?.length ? 'has-error' : ''}`}
                 />
               </div>
               {field.state.meta.errors.map((error: any, i: number) => (
-                <div key={i} className="error">
+                <div key={i} className="error question-error">
                   {typeof error === "string" ? error : error?.message}
                 </div>
               ))}
