@@ -1,5 +1,5 @@
 import express from "express";
-import type { Request, Response } from "express";
+import type { Request, Response, Application } from "express";
 import { errorHandler } from "./common/middlewares/error.middleware.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
@@ -8,9 +8,11 @@ import pollRouter from "./modules/poll/poll.routes.js";
 import responseRouter from "./modules/response/response.routes.js";
 
 
-const app = express();
+const app: Application = express();
 
-app.use(cors({ origin: "http://localhost:5173", credentials: true }));
+let CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:5173';
+
+app.use(cors({ origin: CORS_ORIGIN, credentials: true }));
 
 
 // Express inbuilt middlewares
