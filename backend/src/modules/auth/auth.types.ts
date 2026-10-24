@@ -23,7 +23,7 @@ export interface AuthenticatedRequest extends Request {
 declare global {
     namespace Express {
         interface Request {
-            userId?: string;
+            userId?: string | undefined;
         }
     }
 }

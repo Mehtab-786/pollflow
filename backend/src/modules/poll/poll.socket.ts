@@ -61,7 +61,6 @@ export const registerPollSocketHandlers = (_io: Server, socket: Socket): void =>
 
             // Emit confirmation events for both conventions
             socket.emit("joined_poll_analytics", successPayload);
-            socket.emit("joined-analytics", successPayload);
 
             if (typeof callback === "function") {
                 callback(successPayload);
@@ -97,7 +96,6 @@ export const registerPollSocketHandlers = (_io: Server, socket: Socket): void =>
                 };
 
                 socket.emit("left_poll_analytics", successPayload);
-                socket.emit("left-analytics", successPayload);
 
                 if (typeof callback === "function") {
                     callback(successPayload);
@@ -108,11 +106,8 @@ export const registerPollSocketHandlers = (_io: Server, socket: Socket): void =>
         }
     };
 
-    // Register listeners for both naming conventions
     socket.on("join_poll_analytics", handleJoinAnalytics);
-    socket.on("join-analytics", handleJoinAnalytics);
 
     socket.on("leave_poll_analytics", handleLeaveAnalytics);
-    socket.on("leave-analytics", handleLeaveAnalytics);
 };
 

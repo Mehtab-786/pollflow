@@ -45,7 +45,7 @@ export const emitPollVoteUpdate = (
         // Emit if there are active listeners connected to this room
         if (listenerCount > 0) {
             io.to(roomName).emit("poll:analytics_update", eventData);
-            io.to(roomName).emit("poll-vote-update", eventData);
+            // io.to(roomName).emit("poll-vote-update", eventData);
 
             console.log(`⚡ Broadcasted poll analytics update to ${roomName} (${listenerCount} viewer(s))`);
         }

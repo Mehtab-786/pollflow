@@ -37,7 +37,7 @@ class RegisterDTO extends BaseDTO {
             .messages({
                 "string.empty": "Password is required",
                 "string.min": "Password must contain at least 8 characters",
-                "string.max": "Password must not exceed 128 characters",
+                "string.max": "Password must not exceed 99 characters",
                 "any.required": "Password is required",
             })
     })

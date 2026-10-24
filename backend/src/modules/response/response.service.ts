@@ -53,6 +53,8 @@ const submitPollResponse = async ({
             if (alreadyVoted) {
                 throw new ApiError(400, "You have already voted on this poll");
             }
+        } else {
+            userId = null
         }
 
         // 5. Validate submitted questions & options
@@ -89,6 +91,10 @@ const submitPollResponse = async ({
                     );
                 }
             }
+
+            // TODO (V2): Deduplicate submitted answers using a Set keyed by questionId + optionId.
+            // if the questions is saying multiple answer is allowed and user sending same quesid + optid twise
+            // Reject duplicate question-option pairs with a 400 error before saving the response.
         }
 
         // 6. Check required questions: ensure answer is provided
@@ -160,9 +166,13 @@ const submitPollResponse = async ({
                 optionId: ans.optionId,
             })),
         };
-    } catch (error) {
+    } catch (error: any) {
         if (error instanceof ApiError) {
             throw error;
+        }
+        // Handle database unique constraint violation (race condition / duplicate vote)
+        if (error?.code === "P2002") {
+            throw new ApiError(400, "You have already voted on this poll");
         }
         throw new ApiError(
             500,

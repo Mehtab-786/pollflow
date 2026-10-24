@@ -1,5 +1,4 @@
 import type { Request, Response, NextFunction } from "express";
-import prisma from "../config/db.config.js";
 import ApiError from "../utils/APIError.utils.js";
 import { verifyAccessToken } from "../utils/jwt.utils.js";
 
@@ -21,19 +20,16 @@ const optionalAuthenticateUser = async (
     }
 
     // 2. Verify token signature and expiration
-    let decoded: any;
     try {
-        decoded = verifyAccessToken(token);
+        let decoded: any = verifyAccessToken(token);
+
+        if (decoded || typeof decoded !== "string" && decoded.id) {
+            req.userId = decoded.id;
+        }
     } catch {
-        throw new ApiError(401, "Invalid or expired access token");
+        req.userId = undefined
     }
 
-    if (!decoded || typeof decoded === "string" || !decoded.id) {
-        throw new ApiError(401, "Invalid access token payload");
-    }
-
-    // 3. Attach authenticated user to request
-    req.userId = decoded.id;
 
     next();
 };

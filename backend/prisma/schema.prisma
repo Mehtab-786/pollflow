@@ -125,6 +125,7 @@ model Response {
 
   @@index([pollId])
   @@index([respondentId])
+  @@unique([pollId, respondentId])
 }
 
 

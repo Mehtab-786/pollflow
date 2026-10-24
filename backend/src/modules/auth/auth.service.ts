@@ -85,14 +85,24 @@ const refresh = async (token?: string) => {
         throw new ApiError(401, "Invalid refresh token payload");
     }
 
+    // Verify user still exists in the database
+    const user = await prisma.user.findUnique({
+        where: { id: decoded.id },
+        select: { id: true, email: true },
+    });
+
+    if (!user) {
+        throw new ApiError(401, "User no longer exists");
+    }
+
     const accessToken = generateAccessToken({
-        id: decoded.id,
+        id: user.id,
     });
 
     const refreshToken = generateRefreshToken({
-        id: decoded.id,
-        email: decoded.email,
-    })
+        id: user.id,
+        email: user.email,
+    });
 
     return { accessToken, refreshToken };
 };

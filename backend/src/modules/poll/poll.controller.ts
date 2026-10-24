@@ -18,15 +18,6 @@ const createPoll = async (req: Request, res: Response) => {
         questions,
     } = req.body;
 
-    // Required fields check (throw error if no value and no default exists)
-    if (!title || typeof title !== "string" || !title.trim()) {
-        throw new ApiError(400, "Title is required");
-    }
-
-    if (!questions || !Array.isArray(questions) || questions.length === 0) {
-        throw new ApiError(400, "At least one question is required");
-    }
-
     // Call poll service to handle the creation and database transaction
     const result = await pollService.createPoll({
         creatorId,

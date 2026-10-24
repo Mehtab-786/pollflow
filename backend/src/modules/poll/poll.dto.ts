@@ -6,7 +6,7 @@ class CreatePollDTO extends BaseDTO {
         title: Joi.string().trim().min(5).max(255).required().messages({
             "string.empty": "Title is required",
             "string.min": "Title must contain at least 5 characters",
-            "string.max": "Title must not exceed 50 characters",
+            "string.max": "Title must not exceed 250 characters",
             "any.required": "Title is required",
         }),
         responseMode: Joi.string()
@@ -44,3 +44,40 @@ class CreatePollDTO extends BaseDTO {
 }
 
 export { CreatePollDTO };
+
+
+//  questioons dto joi validation , because we are checking formats manually in service but it will help 
+// to validate the basic structure of the questions
+
+// questions: Joi.array()
+//     .items(
+//         Joi.object({
+//             text: Joi.string().trim().optional(),
+//             question: Joi.string().trim().optional(),
+
+//             type: Joi.string()
+//                 .valid("TEXT", "MULTIPLE_CHOICE")
+//                 .default("MULTIPLE_CHOICE"),
+
+//             selectionMode: Joi.string()
+//                 .valid("SINGLE", "MULTIPLE")
+//                 .default("SINGLE"),
+
+//             isRequired: Joi.boolean().default(true),
+
+//             options: Joi.when("type", {
+//                 is: "MULTIPLE_CHOICE",
+//                 then: Joi.array()
+//                     .items(Joi.string().trim().required())
+//                     .length(4)
+//                     .required(),
+//                 otherwise: Joi.array()
+//                     .optional()
+//                     .default([]),
+//             }),
+//         })
+//             .xor("text", "question")
+//             .required()
+//     )
+//     .min(1)
+//     .required(),
